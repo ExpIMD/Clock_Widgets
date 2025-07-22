@@ -1,5 +1,6 @@
 import tkinter as tk
 import math
+import time
 
 class round_clock:
     def __init__(self, radius: float):
@@ -13,6 +14,7 @@ class round_clock:
         self.__canvas.pack()
     def run(self):
         self.draw()
+        self.update_state()
         self.__root.mainloop()
 
     def draw(self):
@@ -45,3 +47,33 @@ class round_clock:
                 y1: float = self.__center - self.__radius * math.cos(angle)
 
                 self.__canvas.create_line(x0, y0, x1, y1, width=1)
+    
+    def update_state(self):
+        self.__canvas.delete("arrows")
+
+        now = time.localtime()
+        hours = now.tm_hour % 12
+        minutes = now.tm_min
+        seconds = now.tm_sec
+
+        second_angle: float = math.pi / 30 * seconds
+        minute_angle: float = math.pi / 30 * minutes + second_angle / 60
+        hour_angle: float = math.pi / 6  * hours + minute_angle / 12
+
+        second_length: float = self.__radius - 80
+        minute_length: float = self.__radius - 50
+        hour_length: float = self.__radius - 30
+
+        xs = self.__center + second_length * math.sin(second_angle)
+        ys = self.__center - second_length * math.cos(second_angle)
+        self.__canvas.create_line(self.__center, self.__center, xs, ys, fill='black', width=1, tag="arrows")
+
+        xm = self.__center + minute_length * math.sin(minute_angle)
+        ym = self.__center - minute_length * math.cos(minute_angle)
+        self.__canvas.create_line(self.__center, self.__center, xm, ym, fill='black', width=3, tag="arrows")
+
+        xh = self.__center + hour_length * math.sin(hour_angle)
+        yh = self.__center - hour_length * math.cos(hour_angle)
+        self.__canvas.create_line(self.__center, self.__center, xh, yh, fill='black', width=5, tag="arrows")
+
+        self.__root.after(1000, self.update_state)
