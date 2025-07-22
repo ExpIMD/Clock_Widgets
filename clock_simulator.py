@@ -77,3 +77,21 @@ class round_clock:
         self.__canvas.create_line(self.__center, self.__center, xh, yh, fill='black', width=5, tag="arrows")
 
         self.__root.after(1000, self.update_state)
+
+class digital_clock:
+    def __init__(self):
+        self.__root = tk.Tk()
+        self.__root.title("Digital clock")
+        self.__label = tk.Label(self.__root, font=("DS-Digital", 100), bg="black", fg="red")
+        self.__label.pack(padx=40, pady=40)
+
+
+    def update_state(self):
+        now = time.strftime("%H:%M:%S")
+        self.__label.config(text=now)
+        self.__root.after(1000, self.update_state)
+    
+    def run(self):
+        self.update_state()
+        self.__root.mainloop()
+            
