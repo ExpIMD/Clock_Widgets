@@ -14,4 +14,8 @@ The clock shows the current real world time
 
 ## Screenshots
 
-![Round Analog Clock](images/analog_clock.png)
+![Round Analog Clock](images/round_clock.png)
+
+![Pendulum Clock](images/pendulum_clock.png)
+
+![Digital Clock](images/digital_clock.png)

@@ -17,7 +17,7 @@ class round_clock:
 
     THICKNESS: int = 1
 
-    def __init__(self, delay: float = 50) -> None:
+    def __init__(self, delay: float = 20) -> None:
         if delay < 0:
             raise ValueError("'delay' less than zero")
         
