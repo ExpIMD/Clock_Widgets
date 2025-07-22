@@ -2,7 +2,7 @@ import clock_simulator as cs
 
 
 
-c = cs.digital_clock()
+c = cs.pendulum_clock(150)
 c.run()
 
 
