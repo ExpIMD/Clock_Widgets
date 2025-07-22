@@ -8,12 +8,14 @@ class round_clock:
         A class for running a windowed application with a round clock that measures time in the real world
     """
 
-    HOUR_ARROW_LENGTH_OFFSET = 30
-    MINUTE_ARROW_LENGTH_OFFSET = 50
-    SECOND_ARROW_LENGTH_OFFSET = 80
+    HOUR_ARROW_LENGTH_OFFSET: int = 30
+    MINUTE_ARROW_LENGTH_OFFSET: int = 50
+    SECOND_ARROW_LENGTH_OFFSET: int = 80
 
-    HOUR_MARKER_OFFSET = 20
-    MINUTE_MARKER_OFFSET = 10
+    HOUR_MARKER_OFFSET: int = 20
+    MINUTE_MARKER_OFFSET: int = 10
+
+    THICKNESS: int = 1
 
     def __init__(self, delay: float = 50) -> None:
         if delay < 0:
@@ -23,10 +25,9 @@ class round_clock:
         self._background_color = "white"
         self._figure_color = "black"
 
+        self._delay: float = delay
         self._center: tuple[int, int] = (500 / 2, 500 / 2)  # Clock center
         self._radius: float = 200 # Clock radius
-        self._thickness: float = 1
-        self._delay = delay
 
         # Window settings
         self._root.title("Round clock")
@@ -55,7 +56,7 @@ class round_clock:
         # Drawing a circle of clocks
         self._canvas.create_oval(self._center[0] - self._radius, self._center[1] - self._radius,
                                 self._center[0] + self._radius, self._center[1] + self._radius,
-                                outline=self._figure_color, width=self._thickness * 4)
+                                outline=self._figure_color, width=round_clock.THICKNESS * 4)
 
         # Drawing hour markers
         for i in range(12):
@@ -64,10 +65,10 @@ class round_clock:
             x0: float = self._center[0] + (self._radius - round_clock.HOUR_MARKER_OFFSET) * math.sin(angle)
             x1: float = self._center[0] + self._radius * math.sin(angle)
 
-            y0: float = self._center[1] - (self._radius - round_clock.HOUR_MARKER_OFFSET) * math.cos(angle)
-            y1: float = self._center[1] - self._radius * math.cos(angle)
+            y0: float = self._center[1] + (self._radius - round_clock.HOUR_MARKER_OFFSET) * math.cos(angle)
+            y1: float = self._center[1] + self._radius * math.cos(angle)
 
-            self._canvas.create_line(x0, y0, x1, y1, width=self._thickness, fill=self._figure_color)
+            self._canvas.create_line(x0, y0, x1, y1, width=round_clock.THICKNESS, fill=self._figure_color)
             self._canvas.create_text(x0, y0, text=(i+11) % 12 + 1, fill=self._figure_color)
         
         # Drawing minute markers
@@ -81,7 +82,7 @@ class round_clock:
                 y0: float = self._center[1] - (self._radius - round_clock.MINUTE_MARKER_OFFSET) * math.cos(angle)
                 y1: float = self._center[1] - self._radius * math.cos(angle)
 
-                self._canvas.create_line(x0, y0, x1, y1, width=self._thickness, fill=self._figure_color)
+                self._canvas.create_line(x0, y0, x1, y1, width=round_clock.THICKNESS, fill=self._figure_color)
     
     def animate_arrows(self) -> None:
         """
@@ -91,11 +92,11 @@ class round_clock:
 
         self._canvas.delete("arrows") # The 'arrows' tag is used to avoid redrawing the base of the clock
 
-        now = time.time()
+        now: float = time.time()
         local_time = time.localtime(now)
-        hour = local_time.tm_hour % 12
-        minute = local_time.tm_min
-        second = now % 60  
+        hour: int = local_time.tm_hour % 12
+        minute: int = local_time.tm_min
+        second = now % 60
 
         sangle: float = math.pi / 30 * second
         mangle: float = math.pi / 30 * minute + sangle / 60
@@ -108,21 +109,29 @@ class round_clock:
         sx: float = self._center[0] + slength * math.sin(sangle)
         sy: float = self._center[1] - slength * math.cos(sangle)
         self._canvas.create_line(self._center[0], self._center[1], sx, sy,
-                                 fill=self._figure_color, width=self._thickness, tag="arrows")
+                                 fill=self._figure_color, width=round_clock.THICKNESS, tag="arrows")
 
         mx: float = self._center[0] + mlength * math.sin(mangle)
         my: float = self._center[1] - mlength * math.cos(mangle)
         self._canvas.create_line(self._center[0], self._center[1], mx, my,
-                                 fill=self._figure_color, width=self._thickness * 3, tag="arrows")
+                                 fill=self._figure_color, width=round_clock.THICKNESS * 3, tag="arrows")
 
         hx: float = self._center[0] + hlength * math.sin(hangle)
         hy: float = self._center[1] - hlength * math.cos(hangle)
         self._canvas.create_line(self._center[0], self._center[1], hx, hy,
-                                 fill=self._figure_color, width=self._thickness * 5, tag="arrows")
+                                 fill=self._figure_color, width=round_clock.THICKNESS * 5, tag="arrows")
 
         self._root.after(self._delay, self.animate_arrows)
 
 class pendulum_clock(round_clock):
+    """
+    Description:
+        A class for running a windowed application with a pendulum clock that measures time in the real world
+    """
+
+    PENDULUM_LENGTH: int = 250
+    PENDULUM_RADIUS: int = 30
+    
     def __init__(self, delay: int = 20):
         self._root = tk.Tk()
         self._background_color = "white"
@@ -130,7 +139,6 @@ class pendulum_clock(round_clock):
 
         self._center: tuple[int, int] = (500 / 2, 500 / 2)  # Clock center
         self._radius: float = 200 # Clock radius
-        self._thickness: float = 1
         self._delay = delay
 
         # Window settings
@@ -142,10 +150,13 @@ class pendulum_clock(round_clock):
         self._canvas.pack()
 
         self._start_time = time.time()
-        self._pendulum_length = 250
-        self._pendulum_radius = 30
 
     def run(self):
+        """
+        Description:
+            Opens a windowed application with a pendulum clock
+        """
+            
         super().draw()
         super().animate_arrows()
         self.animate_pendulum()
@@ -153,21 +164,26 @@ class pendulum_clock(round_clock):
 
     
     def animate_pendulum(self):
+        """
+        Description:
+            Updates the clock state. Redraws clock pendulum
+        """
+                
         self._canvas.delete("pendulum")
 
         temp = time.time() - self._start_time
         angle: float = math.sin(temp * math.pi) * math.pi / 6
 
         x0: float = self._center[0]
-        x1: float = x0 + self._pendulum_length * math.sin(angle)
+        x1: float = x0 + pendulum_clock.PENDULUM_LENGTH * math.sin(angle)
 
         y0: float = self._center[1] + self._radius
-        y1: float = y0 + self._pendulum_length * math.cos(angle)
+        y1: float = y0 + pendulum_clock.PENDULUM_LENGTH * math.cos(angle)
         
-        self._canvas.create_line(x0, y0, x1, y1, width=self._thickness*4, tags="pendulum")
-        self._canvas.create_oval(x1 - self._pendulum_radius, y1 - self._pendulum_radius,
-                                 x1 + self._pendulum_radius, y1 + self._pendulum_radius,
-                                 width=self._thickness*2, tags="pendulum")
+        self._canvas.create_line(x0, y0, x1, y1, width=round_clock.THICKNESS*4, tags="pendulum")
+        self._canvas.create_oval(x1 - pendulum_clock.PENDULUM_RADIUS, y1 - pendulum_clock.PENDULUM_RADIUS,
+                                 x1 + pendulum_clock.PENDULUM_RADIUS, y1 + pendulum_clock.PENDULUM_RADIUS,
+                                 width=round_clock.THICKNESS, tags="pendulum")
 
         self._root.after(self._delay, self.animate_pendulum)
 
@@ -181,7 +197,7 @@ class pendulum_clock(round_clock):
 # 4|       |5
 #  |---6---|
 
-_SEGMENT_POINTS = {
+_SEGMENT_POINTS = { # Segment coordinates
     0: [(22, 10), (78, 10), (70, 20), (30, 20)],
     1: [(15, 15), (25, 25), (25, 65), (15, 75)],
     2: [(85, 15), (75, 25), (75, 65), (85, 75)],
@@ -191,7 +207,7 @@ _SEGMENT_POINTS = {
     6: [(22, 140), (78, 140), (70, 130), (30, 130)]
 }
 
-_DIGIT_MAP = {
+_DIGIT_MAP = { # Mapping between number and lit segments
     '0': [0,1,2,4,5,6],
     '1': [2,5],
     '2': [0,2,3,4,6],
@@ -207,32 +223,40 @@ _DIGIT_MAP = {
 class _seven_segment_digit:
     """
     Description:
-        Seven segment digit class
+        Class representing a single seven-segment digit using polygons
     """
     def __init__(self, root):
         self._canvas = tk.Canvas(root, width=100, height=150, bg='black', highlightthickness=0)
         self._segments = []
         for i in range(7):
-            points = _SEGMENT_POINTS[i]
-            flat_points = [coord for point in points for coord in point]
-            self._segments.append(self._canvas.create_polygon(flat_points, fill="#330000", outline="#660000"))
+            temp = [coordinate_pair for point in _SEGMENT_POINTS[i] for coordinate_pair in point]
+            self._segments.append(self._canvas.create_polygon(temp, fill="#330000", outline="#660000"))
     
     def set_digit(self, digit: str):
-        active_segments = _DIGIT_MAP[digit]
+        """
+        Description:
+            Set the digit to display by turning on/off segments
+        """
+
+        active_segments = _DIGIT_MAP.get(digit, [])
         for index, segment in enumerate(self._segments):
             if index in active_segments:
                 self._canvas.itemconfig(segment, fill="red")
             else:
-                self._canvas.itemconfig(segment, fill="#330000")
+                self._canvas.itemconfig(segment, fill="#660000")
 
     def grid(self, **kwargs):
+        """
+        Description:
+            Grid the digit canvas in the parent widget
+        """
         self._canvas.grid(**kwargs)
 
         
 class _colon:
     """
     Description:
-        Digital colon class
+        Class representing the colon separator in digital clock display
     """
 
     def __init__(self, root):
@@ -246,7 +270,7 @@ class _colon:
 class digital_clock:
     """
     Description:
-        A class for running a windowed application with a digital clock that measures time in the real world
+        A class for running a windowed application with a digital clock displaying HH:MM:SS with seven-segment digits that measures time in the real world
     """
 
     def __init__(self):        
@@ -261,22 +285,34 @@ class digital_clock:
             d.grid(row=0, column=i + (i // 2))
             self._digits.append(d)
         
-        c1 = _colon(self._root)
+        c1: _colon = _colon(self._root)
+        c2: _colon = _colon(self._root)
+        
         c1.grid(row=0, column=2)
-        c2 = _colon(self._root)
         c2.grid(row=0, column=5)
         
         self._root.title("Digital clock")
         self._root.configure(background=self._background_color)
         self._root.resizable(False, False)
 
-        self.update_state()
+    def animate_digits(self):
+        """
+        Description:
+            Update the displayed time
+        """
 
-    def update_state(self):
-        now = time.strftime("%H%M%S")
+        now: str = time.strftime("%H%M%S")
+
         for i, d in enumerate(now):
             self._digits[i].set_digit(d)
-        self._root.after(1000, self.update_state)
+
+        self._root.after(1000, self.animate_digits)
 
     def run(self):
+        """
+        Description:
+            Opens a windowed application with a digital clock
+        """
+
+        self.animate_digits()
         self._root.mainloop()
