@@ -15,8 +15,6 @@ class round_clock:
     HOUR_MARKER_OFFSET = 20
     MINUTE_MARKER_OFFSET = 10
 
-    MARGIN = 20
-
     def __init__(self, delay: float = 50) -> None:
         if delay < 0:
             raise ValueError("'delay' less than zero")
@@ -25,7 +23,7 @@ class round_clock:
         self._background_color = "white"
         self._figure_color = "black"
 
-        self._center: tuple[int, int] = (800 / 2, 800 / 2)  # Clock center
+        self._center: tuple[int, int] = (500 / 2, 500 / 2)  # Clock center
         self._radius: float = 200 # Clock radius
         self._thickness: float = 1
         self._delay = delay
@@ -35,7 +33,7 @@ class round_clock:
         self._root.configure(background=self._background_color)
         self._root.resizable(False, False)
 
-        self._canvas = tk.Canvas(self._root, width=800, height=800)
+        self._canvas = tk.Canvas(self._root, width=500, height=500)
         self._canvas.pack()
 
     def run(self) -> None:
@@ -124,7 +122,56 @@ class round_clock:
 
         self._root.after(self._delay, self.animate_arrows)
 
-# Each segment is a rectangle (x1, y1, x2, y2)
+class pendulum_clock(round_clock):
+    def __init__(self, delay: int = 20):
+        self._root = tk.Tk()
+        self._background_color = "white"
+        self._figure_color = "black"
+
+        self._center: tuple[int, int] = (500 / 2, 500 / 2)  # Clock center
+        self._radius: float = 200 # Clock radius
+        self._thickness: float = 1
+        self._delay = delay
+
+        # Window settings
+        self._root.title("Pendulum clock")
+        self._root.configure(background=self._background_color)
+        self._root.resizable(False, False)
+
+        self._canvas = tk.Canvas(self._root, width=500, height=750)
+        self._canvas.pack()
+
+        self._start_time = time.time()
+        self._pendulum_length = 250
+        self._pendulum_radius = 30
+
+    def run(self):
+        super().draw()
+        super().animate_arrows()
+        self.animate_pendulum()
+        self._root.mainloop()
+
+    
+    def animate_pendulum(self):
+        self._canvas.delete("pendulum")
+
+        temp = time.time() - self._start_time
+        angle: float = math.sin(temp * math.pi) * math.pi / 6
+
+        x0: float = self._center[0]
+        x1: float = x0 + self._pendulum_length * math.sin(angle)
+
+        y0: float = self._center[1] + self._radius
+        y1: float = y0 + self._pendulum_length * math.cos(angle)
+        
+        self._canvas.create_line(x0, y0, x1, y1, width=self._thickness*4, tags="pendulum")
+        self._canvas.create_oval(x1 - self._pendulum_radius, y1 - self._pendulum_radius,
+                                 x1 + self._pendulum_radius, y1 + self._pendulum_radius,
+                                 width=self._thickness*2, tags="pendulum")
+
+        self._root.after(self._delay, self.animate_pendulum)
+
+# Each segment is a polygon
 # Segments are numbered like this:
 #   ---0---
 #  |       |
@@ -134,7 +181,7 @@ class round_clock:
 # 4|       |5
 #  |---6---|
 
-SEGMENT_POINTS = {
+_SEGMENT_POINTS = {
     0: [(22, 10), (78, 10), (70, 20), (30, 20)],
     1: [(15, 15), (25, 25), (25, 65), (15, 75)],
     2: [(85, 15), (75, 25), (75, 65), (85, 75)],
@@ -144,7 +191,7 @@ SEGMENT_POINTS = {
     6: [(22, 140), (78, 140), (70, 130), (30, 130)]
 }
 
-DIGIT_MAP = {
+_DIGIT_MAP = {
     '0': [0,1,2,4,5,6],
     '1': [2,5],
     '2': [0,2,3,4,6],
@@ -166,12 +213,12 @@ class _seven_segment_digit:
         self._canvas = tk.Canvas(root, width=100, height=150, bg='black', highlightthickness=0)
         self._segments = []
         for i in range(7):
-            points = SEGMENT_POINTS[i]
+            points = _SEGMENT_POINTS[i]
             flat_points = [coord for point in points for coord in point]
             self._segments.append(self._canvas.create_polygon(flat_points, fill="#330000", outline="#660000"))
     
     def set_digit(self, digit: str):
-        active_segments = DIGIT_MAP[digit]
+        active_segments = _DIGIT_MAP[digit]
         for index, segment in enumerate(self._segments):
             if index in active_segments:
                 self._canvas.itemconfig(segment, fill="red")
