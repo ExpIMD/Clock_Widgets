@@ -1,4 +1,4 @@
-# Clock Widgets in Tkinter
+# Clock Widgets
 
 This project contains Python implementations of three types of clocks using the Tkinter GUI toolkit:
 
