@@ -230,7 +230,7 @@ class _seven_segment_digit:
         self._segments = []
         for i in range(7):
             temp = [coordinate_pair for point in _SEGMENT_POINTS[i] for coordinate_pair in point]
-            self._segments.append(self._canvas.create_polygon(temp, fill="#330000", outline="#660000"))
+            self._segments.append(self._canvas.create_polygon(temp, fill="#3F0000", outline="#3F0000"))
     
     def set_digit(self, digit: str):
         """
@@ -243,7 +243,7 @@ class _seven_segment_digit:
             if index in active_segments:
                 self._canvas.itemconfig(segment, fill="red")
             else:
-                self._canvas.itemconfig(segment, fill="#660000")
+                self._canvas.itemconfig(segment, fill="#3F0000")
 
     def grid(self, **kwargs):
         """
