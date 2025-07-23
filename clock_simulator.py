@@ -60,16 +60,16 @@ class round_clock:
 
         # Drawing hour markers
         for i in range(12):
-            angle: float = math.pi / 6 * i # The angle between the hour markers is 30 degrees (pi/6 radians)
+            angle: float = - math.pi / 6 * i + math.pi / 2 # The angle between the hour markers is 30 degrees (pi/6 radians)
 
-            x0: float = self._center[0] + (self._radius - round_clock.HOUR_MARKER_OFFSET) * math.sin(angle)
-            x1: float = self._center[0] + self._radius * math.sin(angle)
+            x0: float = self._center[0] + (self._radius - round_clock.HOUR_MARKER_OFFSET) * math.cos(angle)
+            x1: float = self._center[0] + self._radius * math.cos(angle)
 
-            y0: float = self._center[1] + (self._radius - round_clock.HOUR_MARKER_OFFSET) * math.cos(angle)
-            y1: float = self._center[1] + self._radius * math.cos(angle)
+            y0: float = self._center[1] - (self._radius - round_clock.HOUR_MARKER_OFFSET) * math.sin(angle)
+            y1: float = self._center[1] - self._radius * math.sin(angle)
 
             self._canvas.create_line(x0, y0, x1, y1, width=round_clock.THICKNESS, fill=self._figure_color)
-            self._canvas.create_text(x0, y0, text=(i+11) % 12 + 1, fill=self._figure_color)
+            self._canvas.create_text(x0, y0, text=(i + 11) % 12 + 1, fill=self._figure_color)
         
         # Drawing minute markers
         for i in range(60):
